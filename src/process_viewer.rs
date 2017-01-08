@@ -19,6 +19,7 @@ use gtk::{AboutDialog, Button, Dialog, Entry, IconSize, Image, Label, MenuBar, M
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::process::{Command, Stdio};
+#[cfg(not(target_os = "windows"))]
 use std::os::unix::process::CommandExt;
 use std::rc::Rc;
 
@@ -29,6 +30,7 @@ use procs::{create_and_fill_model, Procs};
 mod color;
 mod display_sysinfo;
 mod graph;
+#[macro_use] mod macros;
 mod notebook;
 mod process_dialog;
 mod procs;
@@ -61,7 +63,7 @@ fn update_window(list: &gtk::ListStore, system: &Rc<RefCell<sysinfo::System>>,
 
     for (pid, pro) in entries.iter() {
         if !seen.contains(pid) {
-            create_and_fill_model(list, pro.pid, &pro.cmd, &pro.name, pro.cpu_usage, pro.memory);
+            create_and_fill_model(list, auto_cast!(pro.pid, i64), &pro.cmd, &pro.name, pro.cpu_usage, pro.memory);
         }
     }
 }
@@ -98,16 +100,34 @@ fn parse_entry(line: &str) -> Vec<String> {
     }
 }
 
+macro_rules! target_switch {
+    ($code: $expr) => {{
+        #[cfg(not(target_os = "windows"))]
+        {
+            $code
+        }
+    }}
+}
+
+fn detach_proc(cmd: &mut Command) -> &mut Command {
+    #[cfg(not(target_os = "windows"))]
+    {
+        cmd.before_exec(|| {
+            unsafe { libc::setsid() };
+            Ok(())
+        })
+    }
+    #[cfg(target_os = "windows")]
+    {
+        cmd
+    }
+}
+
 fn start_detached_process(line: &str) -> Option<String> {
     let args = parse_entry(line);
     let command = args[0].clone();
 
-    if let Err(_) = Command::new(&command)
-                            .args(&args)
-                            .before_exec(|| {
-                                unsafe { libc::setsid() };
-                                Ok(())
-                            })
+    if let Err(_) = detach_proc(Command::new(&command).args(&args))
                             .stdin(Stdio::null())
                             .stderr(Stdio::null())
                             .stdout(Stdio::null())

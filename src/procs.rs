@@ -63,7 +63,7 @@ impl Procs {
         columns[2].set_sort_column_id(5);
 
         for (_, pro) in proc_list {
-            create_and_fill_model(&list_store, pro.pid, &pro.cmd, &pro.name, pro.cpu_usage,
+            create_and_fill_model(&list_store, auto_cast!(pro.pid, i64), &pro.cmd, &pro.name, pro.cpu_usage,
                                   pro.memory);
         }
 
