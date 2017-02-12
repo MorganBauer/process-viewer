@@ -136,7 +136,7 @@ fn append_column(title: &str, v: &mut Vec<gtk::TreeViewColumn>, left_tree: &gtk:
 
 pub fn create_and_fill_model(list_store: &gtk::ListStore, pid: i64, cmdline: &str, name: &str,
                              cpu: f32, memory: u64) {
-    if cmdline.len() < 1 {
+    if cfg!(not(windows)) && cmdline.is_empty() {
         return;
     }
     list_store.insert_with_values(None,

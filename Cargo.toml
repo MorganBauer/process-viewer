@@ -2,7 +2,6 @@
 name = "process_viewer"
 version = "0.0.4"
 authors = ["Guillaume Gomez <guillaume1.gomez@gmail.com>"]
-build = "build.rs"
 
 description = "A process viewer GUI"
 repository = "https://github.com/GuillaumeGomez/process-viewer"
@@ -12,9 +11,6 @@ homepage = "https://github.com/GuillaumeGomez/process-viewer"
 readme = "README.md"
 
 keywords = ["GUI", "process", "viewer", "gtk"]
-
-[target.'cfg(windows)'.build-dependencies]
-pkg-config = "0.3"
 
 [dependencies]
 gtk-sys = "0.3.1"

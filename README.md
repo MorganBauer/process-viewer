@@ -12,3 +12,12 @@ It can be run on the following platforms:
 
  * Linux
  * Mac OSX
+ * Windows
+
+## A few notes on Windows installation
+
+To install and run GTK+ on Windows, a good way to do it can be found
+[here](http://gtk-rs.org/docs/requirements.html).
+
+If needed, you can take a look at the `setup.cmd` file to install and setup environment. You'll
+need to modify it to fulfill your needs.
